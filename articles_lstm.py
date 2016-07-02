@@ -126,7 +126,11 @@ model.add(Dropout(0.5))
 model.add(Dense(nb_classes))
 model.add(Activation('sigmoid'))
 
-model.compile(loss='binary_crossentropy', optimizer='rmsprop')
+model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
 model.fit(X_train, Y_train, nb_epoch=nb_epoch, batch_size=batch_size, verbose=1, show_accuracy=True,
                   validation_split=0.1)
+
+score = model.evaluate(X_test, Y_test, batch_size=batch_size)
+
+print(score)
