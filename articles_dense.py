@@ -13,14 +13,12 @@ from keras.layers import Embedding
 from keras.layers import LSTM
 import tensorflow as tf
 import numpy as np
-from keras.datasets import imdb
-from keras.utils.np_utils import to_categorical
 
 from sklearn.cross_validation import train_test_split
 
 np.random.seed(1337)  # for reproducibility
 max_sentence_length = 6
-max_lines = 100000
+max_lines = 10000
 batch_size = 8
 nb_epoch = 3
 validation_split = 0.2
@@ -118,10 +116,9 @@ print('Building model...')
 
 model = Sequential()
 
-model.add(Embedding(6, 256, input_length=X_train.shape[1]))
-model.add(LSTM(output_dim=128, activation='sigmoid', inner_activation='hard_sigmoid'))
-model.add(Dropout(0.5))
-model.add(Dense(nb_classes))
+model.add(Dense(512, input_dim=X_train.shape[1]))
+model.add(Activation('sigmoid'))
+model.add(Dense(nb_classes, input_dim=X_train.shape[1]))
 model.add(Activation('sigmoid'))
 
 model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
