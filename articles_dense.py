@@ -131,8 +131,6 @@ def create_model():
     model = Sequential()
     model.add(Dense(512, input_dim=X_train.shape[1]))
     model.add(Activation('tanh'))
-    model.add(Dense(hidden_dims))
-    model.add(Activation('relu'))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
