@@ -3,5 +3,7 @@
 ## Setup
 You need Python and Keras.
 
-A huge text corpus can be downloaded into the **data**-folder from [here](http://www.statmt.org/europarl/).
-I use the english file from the parallel corpus German-English v7.
+## Run
+THEANO_FLAGS='floatX=float32,openmp=True' OMP_NUM_THREADS=12 python articles_dense.py
+
+Adjust OMP_NUM_THREADS to your number of CPUs.
