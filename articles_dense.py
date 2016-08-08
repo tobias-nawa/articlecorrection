@@ -1,4 +1,8 @@
 from __future__ import print_function
+
+import os
+import tarfile
+import urllib
 import zipfile
 from collections import Counter
 
@@ -22,19 +26,27 @@ from sklearn.metrics.classification import classification_report
 seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
-max_lines = 10000
+max_lines = 100000
 batch_size = 256
-hidden_dims = 10000
+hidden_dims = 20000
 nb_epoch = 3
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 optim = 'adam'
 loss = 'categorical_crossentropy'
 
-def read_data(filename):
-    """Extract the first file enclosed in a zip file as a list of words"""
+
+def read_data():
+    if 'europarl-v7.de-en.en' not in os.listdir('data'):
+        print("Downloading corpus (189 MB)...")
+        url = 'http://www.statmt.org/europarl/v7/de-en.tgz'
+        filename = "data/de-en.tgz"
+        urllib.urlretrieve(url, filename)
+        tar = tarfile.open(filename, "r:gz")
+        tar.extractall("data/")
+        tar.close()
     lines = []
-    with open(filename) as f:
+    with open("data/europarl-v7.de-en.en") as f:
         for line in f:
             line_processed = tf.compat.as_str(line).decode('utf-8').encode("utf-8")
             lines.append(line_processed)
@@ -42,12 +54,12 @@ def read_data(filename):
                 break
     return lines
 
+
 tokenizer = Tokenizer(nb_words=None, filters=base_filter(),
         lower=True, split=" ")
 # tokenizer = Tokenizer(nb_words=None)
 
-filename = "data/europarl-v7.de-en.en"
-lines = read_data(filename)
+lines = read_data()
 print('Lines:', len(lines))
 
 X = []
