@@ -1,10 +1,11 @@
 from __future__ import print_function
 import zipfile
+from collections import Counter
 
 from keras.layers.recurrent import GRU
 from keras.layers.wrappers import TimeDistributed
 from keras.utils import np_utils
-from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.text import Tokenizer, one_hot
 from keras.preprocessing.text import base_filter
 from keras.preprocessing import text, sequence
 from keras.models import Sequential
@@ -13,15 +14,22 @@ from keras.layers import Embedding
 from keras.layers import LSTM
 import tensorflow as tf
 import numpy as np
+from keras.wrappers.scikit_learn import KerasClassifier
 
-from sklearn.cross_validation import train_test_split
+from sklearn.cross_validation import train_test_split, StratifiedKFold, cross_val_score
+from sklearn.metrics.classification import classification_report
 
-np.random.seed(1337)  # for reproducibility
-max_sentence_length = 6
+seed = 1337
+np.random.seed(seed)  # for reproducibility
+input_dim = 6
 max_lines = 10000
-batch_size = 8
+batch_size = 256
+hidden_dims = 512
 nb_epoch = 3
+nb_classes = 4 # a, an, the, none
 validation_split = 0.2
+optim = 'adam'
+loss = 'categorical_crossentropy'
 
 def read_data(filename):
     """Extract the first file enclosed in a zip file as a list of words"""
@@ -46,7 +54,7 @@ X = []
 Y = []
 for line in lines:
     words = line.lower().strip().split(" ")
-    if len(words) < max_sentence_length:
+    if len(words) < input_dim:
         continue
     sentence = []
     y = None
@@ -62,7 +70,7 @@ for line in lines:
         else:
             sentence.append(word)
 
-        if len(sentence) == max_sentence_length:
+        if len(sentence) == input_dim:
             X.append(" ".join(sentence))
             if not y:
                 y = "none"
@@ -71,8 +79,7 @@ for line in lines:
     if len(X) == max_lines:
         break
 
-
-tokenizer.fit_on_texts(X + Y)
+tokenizer.fit_on_texts(Y + X)
 
 print("size X:", len(X))
 print("size Y:", len(Y))
@@ -84,11 +91,14 @@ print(len(X_test), 'test sentences')
 print(len(Y_train), 'train classes')
 print(len(Y_test), 'test classes')
 
-print('Vectorizing sequence data...')
+c = Counter(Y_train)
+print(c.items())
+
+X_train = tokenizer.texts_to_matrix(X_train, mode='binary')
+X_test = tokenizer.texts_to_matrix(X_test, mode='binary')
+
 Y_train = tokenizer.texts_to_sequences(Y_train)
 Y_test = tokenizer.texts_to_sequences(Y_test)
-
-nb_classes = np.max(Y_train) + 1
 
 Y_train_new = []
 Y_test_new = []
@@ -96,35 +106,48 @@ for y in Y_train:
     Y_train_new.append(y[0])
 for y in Y_test:
     Y_test_new.append(y[0])
-Y_train = np.array(Y_train_new)
-Y_test = np.array(Y_test_new)
 
-X_train = tokenizer.texts_to_matrix(X_train, mode='binary')
-X_test = tokenizer.texts_to_matrix(X_test, mode='binary')
+Y_train = Y_train_new
+Y_test = Y_test_new
+
+c = Counter(Y_train)
+print(c.items())
+
+nb_classes = np.max(Y_train) + 1
 
 print('Convert class vector to binary class matrix (for use with categorical_crossentropy)')
-Y_train = np_utils.to_categorical(Y_train, nb_classes)
-Y_test = np_utils.to_categorical(Y_test, nb_classes)
+Y_train = np_utils.to_categorical(Y_train, nb_classes=nb_classes)
+# Y_test = np_utils.to_categorical(Y_test, nb_classes=nb_classes)
 
 print('X_train shape:', X_train.shape)
 print('Y_train shape:', Y_train.shape)
 print('X_test shape:', X_test.shape)
-print('Y_test shape:', Y_test.shape)
 
 
 print('Building model...')
 
-model = Sequential()
 
-model.add(Dense(512, input_dim=X_train.shape[1]))
-model.add(Activation('sigmoid'))
-model.add(Dense(nb_classes, input_dim=X_train.shape[1]))
-model.add(Activation('sigmoid'))
+def create_model():
+    model = Sequential()
+    model.add(Dense(512, input_dim=X_train.shape[1]))
+    model.add(Activation('tanh'))
+    model.add(Dense(hidden_dims))
+    model.add(Activation('relu'))
+    model.add(Dense(nb_classes))
+    model.add(Activation('softmax'))
+    model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
+    return model
 
-model.compile(loss='categorical_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
 
-model.fit(X_train, Y_train, nb_epoch=nb_epoch, batch_size=batch_size, verbose=1, validation_split=validation_split)
+classifier = KerasClassifier(build_fn=create_model, nb_epoch=nb_epoch, batch_size=batch_size)
+classifier.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch)
+score = classifier.score(X_train, Y_train, batch_size=batch_size)
+Y_pred = classifier.predict(X_test, batch_size=batch_size)
 
-score = model.evaluate(X_test, Y_test, batch_size=batch_size)
+print(classification_report(y_true=Y_test, y_pred=Y_pred))
 
-print(score)
+# model.fit(X_train, Y_train, nb_epoch=nb_epoch, batch_size=batch_size, verbose=1, validation_split=validation_split)
+#
+# score = model.evaluate(X_test, Y_test, batch_size=batch_size)
+#
+# print(score)
