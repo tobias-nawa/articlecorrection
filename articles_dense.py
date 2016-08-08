@@ -24,7 +24,7 @@ np.random.seed(seed)  # for reproducibility
 input_dim = 6
 max_lines = 10000
 batch_size = 256
-hidden_dims = 512
+hidden_dims = 10000
 nb_epoch = 3
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
@@ -52,6 +52,7 @@ print('Lines:', len(lines))
 
 X = []
 Y = []
+counter = Counter()
 for line in lines:
     words = line.lower().strip().split(" ")
     if len(words) < input_dim:
@@ -117,7 +118,6 @@ nb_classes = np.max(Y_train) + 1
 
 print('Convert class vector to binary class matrix (for use with categorical_crossentropy)')
 Y_train = np_utils.to_categorical(Y_train, nb_classes=nb_classes)
-# Y_test = np_utils.to_categorical(Y_test, nb_classes=nb_classes)
 
 print('X_train shape:', X_train.shape)
 print('Y_train shape:', Y_train.shape)
@@ -129,8 +129,10 @@ print('Building model...')
 
 def create_model():
     model = Sequential()
-    model.add(Dense(512, input_dim=X_train.shape[1]))
+    model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Activation('tanh'))
+    model.add(Dense(hidden_dims))
+    model.add(Activation('relu'))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
@@ -139,13 +141,6 @@ def create_model():
 
 classifier = KerasClassifier(build_fn=create_model, nb_epoch=nb_epoch, batch_size=batch_size)
 classifier.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch)
-score = classifier.score(X_train, Y_train, batch_size=batch_size)
 Y_pred = classifier.predict(X_test, batch_size=batch_size)
 
 print(classification_report(y_true=Y_test, y_pred=Y_pred))
-
-# model.fit(X_train, Y_train, nb_epoch=nb_epoch, batch_size=batch_size, verbose=1, validation_split=validation_split)
-#
-# score = model.evaluate(X_test, Y_test, batch_size=batch_size)
-#
-# print(score)
