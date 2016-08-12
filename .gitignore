@@ -8,6 +8,7 @@
 [Ll]ocal
 [Ss]cripts
 [Ss]hare
+[Mm]an
 pyvenv.cfg
 .venv
 pip-selfcheck.json
