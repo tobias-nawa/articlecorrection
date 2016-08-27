@@ -107,18 +107,8 @@ print(len(Y_test), 'test classes')
 c = Counter(Y_train)
 print(c.items())
 
-X_train = tokenizer.texts_to_sequences(X_train)
-X_test = tokenizer.texts_to_sequences(X_test)
-
-X_train_new = []
-X_test_new = []
-for x in X_train:
-    X_train_new.append(x[0])
-for x in X_test:
-    X_test_new.append(x[0])
-
-X_train = X_train_new
-X_test = X_test_new
+X_train = tokenizer.texts_to_matrix(X_train, mode='binary')
+X_test = tokenizer.texts_to_matrix(X_test, mode='binary')
 
 Y_train = tokenizer.texts_to_sequences(Y_train)
 Y_test = tokenizer.texts_to_sequences(Y_test)
