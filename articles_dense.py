@@ -26,7 +26,7 @@ from sklearn.metrics.classification import classification_report
 seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
-max_lines = 100000
+max_lines = 1000
 batch_size = 256
 hidden_dims = 20000
 nb_epoch = 3
@@ -107,8 +107,18 @@ print(len(Y_test), 'test classes')
 c = Counter(Y_train)
 print(c.items())
 
-X_train = tokenizer.texts_to_matrix(X_train, mode='binary')
-X_test = tokenizer.texts_to_matrix(X_test, mode='binary')
+X_train = tokenizer.texts_to_sequences(X_train)
+X_test = tokenizer.texts_to_sequences(X_test)
+
+X_train_new = []
+X_test_new = []
+for x in X_train:
+    X_train_new.append(x[0])
+for x in X_test:
+    X_test_new.append(x[0])
+
+X_train = X_train_new
+X_test = X_test_new
 
 Y_train = tokenizer.texts_to_sequences(Y_train)
 Y_test = tokenizer.texts_to_sequences(Y_test)
@@ -127,6 +137,8 @@ c = Counter(Y_train)
 print(c.items())
 
 nb_classes = np.max(Y_train) + 1
+
+print('nb_classes:', nb_classes)
 
 print('Convert class vector to binary class matrix (for use with categorical_crossentropy)')
 Y_train = np_utils.to_categorical(Y_train, nb_classes=nb_classes)
