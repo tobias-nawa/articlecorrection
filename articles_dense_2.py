@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os
+import string
 import tarfile
 import urllib
 import zipfile
@@ -27,14 +28,15 @@ seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
 max_lines = 100000
-batch_size = 500
-hidden_dims = 10
-nb_epoch = 5
+batch_size = 256
+hidden_dims = 1000
+nb_epoch = 20
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 optim = 'adam'
 loss = 'categorical_crossentropy'
 
+exclude = set(string.punctuation)
 
 def read_data():
     if 'europarl-v7.de-en.en' not in os.listdir('data'):
@@ -49,6 +51,7 @@ def read_data():
     with open("data/europarl-v7.de-en.en") as f:
         for line in f:
             line_processed = tf.compat.as_str(line).decode('utf-8').encode("utf-8")
+            line_processed = ''.join(ch for ch in line_processed if ch not in exclude)
             lines.append(line_processed)
             if len(lines) == max_lines:
                 break
@@ -92,6 +95,7 @@ for line in lines:
     if len(X) == max_lines:
         break
 
+
 tokenizer.fit_on_texts(Y + X)
 
 print("size X:", len(X))
@@ -107,8 +111,14 @@ print(len(Y_test), 'test classes')
 c = Counter(Y_train)
 print(c.items())
 
-X_train = tokenizer.texts_to_matrix(X_train, mode='binary')
-X_test = tokenizer.texts_to_matrix(X_test, mode='binary')
+X_train = tokenizer.texts_to_sequences(X_train)
+X_test = tokenizer.texts_to_sequences(X_test)
+
+X_train = sequence.pad_sequences(X_train)
+X_test = sequence.pad_sequences(X_test)
+
+for x in X_train[0:5]:
+    print(x)
 
 Y_train = tokenizer.texts_to_sequences(Y_train)
 Y_test = tokenizer.texts_to_sequences(Y_test)
@@ -128,6 +138,8 @@ print(c.items())
 
 nb_classes = np.max(Y_train) + 1
 
+print('nb_classes:', nb_classes)
+
 print('Convert class vector to binary class matrix (for use with categorical_crossentropy)')
 Y_train = np_utils.to_categorical(Y_train, nb_classes=nb_classes)
 
@@ -143,8 +155,6 @@ def create_model():
     model = Sequential()
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Activation('tanh'))
-    model.add(Dense(hidden_dims))
-    model.add(Activation('relu'))
     model.add(Dense(hidden_dims))
     model.add(Activation('relu'))
     model.add(Dense(nb_classes))
