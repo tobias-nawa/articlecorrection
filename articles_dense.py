@@ -143,7 +143,7 @@ def create_model():
     model = Sequential()
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Activation('tanh'))
-    model.add(Dropout(0.2))
+    model.add(Dropout(0.5))
     model.add(Dense(hidden_dims))
     model.add(Activation('relu'))
     model.add(Dropout(0.2))
