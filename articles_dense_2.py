@@ -29,7 +29,7 @@ np.random.seed(seed)  # for reproducibility
 input_dim = 6
 max_lines = 100000
 batch_size = 256
-hidden_dims = 1000
+hidden_dims = 10000
 nb_epoch = 20
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
