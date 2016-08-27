@@ -27,9 +27,9 @@ seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
 max_lines = 100000
-batch_size = 500
-hidden_dims = 10
-nb_epoch = 5
+batch_size = 256
+hidden_dims = 30000
+nb_epoch = 3
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 optim = 'adam'
@@ -143,10 +143,10 @@ def create_model():
     model = Sequential()
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Activation('tanh'))
+    model.add(Dropout(0.2))
     model.add(Dense(hidden_dims))
     model.add(Activation('relu'))
-    model.add(Dense(hidden_dims))
-    model.add(Activation('relu'))
+    model.add(Dropout(0.2))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
