@@ -20,6 +20,7 @@ from keras.layers import LSTM
 import tensorflow as tf
 import numpy as np
 from keras.wrappers.scikit_learn import KerasClassifier
+import matplotlib.pyplot as plt
 
 from sklearn.cross_validation import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.metrics.classification import classification_report
@@ -29,10 +30,10 @@ np.random.seed(seed)  # for reproducibility
 input_dim = 6
 max_lines = 100000
 batch_size = 256
-nb_epoch = 25
+nb_epoch = 500
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
-loss = 'mean_squared_error'
+loss = 'categorical_crossentropy'
 optim = 'adam'
 
 exclude = set(string.punctuation)
@@ -164,7 +165,26 @@ def create_model():
 
 
 classifier = KerasClassifier(build_fn=create_model, nb_epoch=nb_epoch, batch_size=batch_size)
-classifier.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch)
+history = classifier.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch)
 Y_pred = classifier.predict(X_test, batch_size=batch_size)
 
 print(classification_report(y_true=Y_test, y_pred=Y_pred, target_names=articles))
+
+plt.figure()
+plt.plot(history.history['acc'])
+plt.plot(history.history['val_acc'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig("data/acc.png")
+
+# summarize history for loss
+plt.figure()
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig("data/loss.png")
