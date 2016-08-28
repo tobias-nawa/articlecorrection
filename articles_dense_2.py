@@ -157,14 +157,9 @@ print('Building model...')
 def create_model():
     model = Sequential()
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
-    model.add(Activation('tanh'))
     model.add(Dense(20000))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.3))
-    model.add(Dense(10000))
-    model.add(Activation('relu'))
-    model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
+    model.add(Dense(nb_classes))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
     return model
 
