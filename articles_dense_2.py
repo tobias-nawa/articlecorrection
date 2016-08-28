@@ -27,9 +27,8 @@ from sklearn.metrics.classification import classification_report
 seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
-max_lines = 100000
+max_lines = 1000000
 batch_size = 256
-hidden_dims = 10000
 nb_epoch = 20
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
@@ -155,7 +154,10 @@ def create_model():
     model = Sequential()
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Activation('tanh'))
-    model.add(Dense(hidden_dims))
+    model.add(Dense(100000))
+    model.add(Activation('relu'))
+    model.add(Dropout(0.3))
+    model.add(Dense(10000))
     model.add(Activation('relu'))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
