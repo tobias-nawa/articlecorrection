@@ -32,8 +32,8 @@ batch_size = 256
 nb_epoch = 25
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
-loss = 'categorical_crossentropy'
-optim = 'adam'
+loss = 'mean_squared_error'
+optim = 'sgd'
 
 exclude = set(string.punctuation)
 
