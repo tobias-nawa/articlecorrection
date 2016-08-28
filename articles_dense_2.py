@@ -158,7 +158,6 @@ def create_model():
     model = Sequential()
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Dense(20000))
-    model.add(Activation('softmax'))
     model.add(Dense(nb_classes))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
     return model
