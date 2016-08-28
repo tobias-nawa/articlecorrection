@@ -33,7 +33,7 @@ nb_epoch = 25
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 loss = 'mean_squared_error'
-optim = 'sgd'
+optim = 'adam'
 
 exclude = set(string.punctuation)
 
