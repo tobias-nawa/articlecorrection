@@ -27,13 +27,13 @@ from sklearn.metrics.classification import classification_report
 seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
-max_lines = 1000000
+max_lines = 100000
 batch_size = 256
-nb_epoch = 20
+nb_epoch = 25
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
-optim = 'adam'
 loss = 'categorical_crossentropy'
+optim = 'adam'
 
 exclude = set(string.punctuation)
 
@@ -119,28 +119,32 @@ X_test = sequence.pad_sequences(X_test)
 for x in X_train[0:5]:
     print(x)
 
-Y_train = tokenizer.texts_to_sequences(Y_train)
-Y_test = tokenizer.texts_to_sequences(Y_test)
+# Y_train = tokenizer.texts_to_sequences(Y_train)
+# Y_test = tokenizer.texts_to_sequences(Y_test)
+
+vectors = {'a': [0, 0, 0, 1], 'an': [0, 0, 1, 0], 'the': [0, 1, 0, 0], 'none': [1, 0, 0, 0]}
+identifiers = {'a': 0, 'an': 1, 'the': 2, 'none': 3}
+articles = ['a', 'an', 'the', 'none']
 
 Y_train_new = []
 Y_test_new = []
 for y in Y_train:
-    Y_train_new.append(y[0])
+    Y_train_new.append(vectors[y])
+
 for y in Y_test:
-    Y_test_new.append(y[0])
+    Y_test_new.append(identifiers[y])
 
-Y_train = Y_train_new
-Y_test = Y_test_new
+Y_train = np.asarray(Y_train_new)
+Y_test = np.asarray(Y_test_new)
 
-c = Counter(Y_train)
-print(c.items())
 
-nb_classes = np.max(Y_train) + 1
+
+nb_classes = 4
 
 print('nb_classes:', nb_classes)
 
-print('Convert class vector to binary class matrix (for use with categorical_crossentropy)')
-Y_train = np_utils.to_categorical(Y_train, nb_classes=nb_classes)
+# print('Convert class vector to binary class matrix (for use with categorical_crossentropy)')
+# Y_train = np_utils.to_categorical(Y_train, nb_classes=nb_classes)
 
 print('X_train shape:', X_train.shape)
 print('Y_train shape:', Y_train.shape)
@@ -169,4 +173,4 @@ classifier = KerasClassifier(build_fn=create_model, nb_epoch=nb_epoch, batch_siz
 classifier.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch)
 Y_pred = classifier.predict(X_test, batch_size=batch_size)
 
-print(classification_report(y_true=Y_test, y_pred=Y_pred))
+print(classification_report(y_true=Y_test, y_pred=Y_pred, target_names=articles))
