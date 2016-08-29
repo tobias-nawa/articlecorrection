@@ -20,7 +20,7 @@ from keras.layers import LSTM
 import tensorflow as tf
 import numpy as np
 from keras.wrappers.scikit_learn import KerasClassifier
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 from sklearn.cross_validation import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.metrics.classification import classification_report
