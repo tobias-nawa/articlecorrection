@@ -19,6 +19,9 @@ from keras.layers import LSTM
 import tensorflow as tf
 import numpy as np
 from keras.wrappers.scikit_learn import KerasClassifier
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
 from sklearn.cross_validation import train_test_split, StratifiedKFold, cross_val_score
@@ -27,9 +30,9 @@ from sklearn.metrics.classification import classification_report
 seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
-max_lines = 100000
+max_lines = 1000
 batch_size = 256
-nb_epoch = 25
+nb_epoch = 4
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 optim = 'adam'
