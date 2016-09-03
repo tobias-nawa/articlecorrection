@@ -30,9 +30,9 @@ from sklearn.metrics.classification import classification_report
 seed = 1337
 np.random.seed(seed)  # for reproducibility
 input_dim = 6
-max_lines = 1000
+max_lines = 100000
 batch_size = 256
-nb_epoch = 4
+nb_epoch = 25
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 optim = 'adam'
@@ -163,17 +163,17 @@ print(classification_report(y_true=Y_test, y_pred=Y_pred))
 
 plt.figure()
 plt.plot(history.history['acc'])
-plt.title('model accuracy')
-plt.ylabel('accuracy')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
+plt.title('Genauigkeit')
+plt.ylabel('Genauigkeit')
+plt.xlabel('Epoche')
+plt.legend(['Training', 'Test'], loc='upper left')
 plt.savefig("data/acc.png")
 
 # summarize history for loss
 plt.figure()
 plt.plot(history.history['loss'])
-plt.title('model loss')
-plt.ylabel('loss')
-plt.xlabel('epoch')
-plt.legend(['train', 'test'], loc='upper left')
+plt.title('Loss Werte')
+plt.ylabel('Loss')
+plt.xlabel('Epoche')
+plt.legend(['Training', 'Test'], loc='upper left')
 plt.savefig("data/loss.png")
