@@ -19,6 +19,7 @@ from keras.layers import LSTM
 import tensorflow as tf
 import numpy as np
 from keras.wrappers.scikit_learn import KerasClassifier
+import matplotlib.pyplot as plt
 
 from sklearn.cross_validation import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.metrics.classification import classification_report
@@ -28,8 +29,7 @@ np.random.seed(seed)  # for reproducibility
 input_dim = 6
 max_lines = 100000
 batch_size = 256
-hidden_dims = 30000
-nb_epoch = 3
+nb_epoch = 25
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 optim = 'adam'
@@ -144,9 +144,8 @@ def create_model():
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Activation('tanh'))
     model.add(Dropout(0.5))
-    model.add(Dense(hidden_dims))
+    model.add(Dense(20000))
     model.add(Activation('relu'))
-    model.add(Dropout(0.2))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
@@ -154,7 +153,24 @@ def create_model():
 
 
 classifier = KerasClassifier(build_fn=create_model, nb_epoch=nb_epoch, batch_size=batch_size)
-classifier.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch)
+history = classifier.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch)
 Y_pred = classifier.predict(X_test, batch_size=batch_size)
 
 print(classification_report(y_true=Y_test, y_pred=Y_pred))
+
+plt.figure()
+plt.plot(history.history['acc'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig("data/acc.png")
+
+# summarize history for loss
+plt.figure()
+plt.plot(history.history['loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig("data/loss.png")
