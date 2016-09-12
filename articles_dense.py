@@ -35,7 +35,7 @@ batch_size = 256
 nb_epoch = 25
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
-optim = 'sgd'
+optim = 'adadelta'
 loss = 'categorical_crossentropy'
 
 
