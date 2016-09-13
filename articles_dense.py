@@ -32,7 +32,7 @@ np.random.seed(seed)  # for reproducibility
 input_dim = 6
 max_lines = 100000
 batch_size = 256
-nb_epoch = 50
+nb_epoch = 25
 nb_classes = 4 # a, an, the, none
 validation_split = 0.2
 optim = 'adadelta'
@@ -145,8 +145,8 @@ print('Building model...')
 def create_model():
     model = Sequential()
     model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
-    model.add(Activation('tanh'))
-    model.add(Dense(50))
+    model.add(Activation('relu'))
+    model.add(Dense(20000))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
     model.add(Dense(nb_classes))
