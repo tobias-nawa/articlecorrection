@@ -148,7 +148,7 @@ def create_model():
     model.add(Activation('relu'))
     model.add(Dense(20000))
     model.add(Activation('relu'))
-    model.add(Dropout(0.6))
+    model.add(Dropout(0.4))
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
