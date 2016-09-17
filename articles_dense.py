@@ -6,7 +6,7 @@ import urllib
 import zipfile
 from collections import Counter
 
-from keras.layers.recurrent import GRU
+from keras.layers.recurrent import GRU, SimpleRNN
 from keras.layers.wrappers import TimeDistributed
 from keras.utils import np_utils
 from keras.preprocessing.text import Tokenizer, one_hot
@@ -144,13 +144,12 @@ print('Building model...')
 
 def create_model():
     model = Sequential()
-    model.add(Dense(X_train.shape[1], input_dim=X_train.shape[1]))
+    model.add(SimpleRNN(X_train.shape[1], input_dim=X_train.shape[1]))
     model.add(Activation('relu'))
-    model.add(Dropout(0.9))
-    model.add(Dense(20000))
+    model.add(SimpleRNN(20000))
     model.add(Activation('relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(nb_classes))
+    model.add(SimpleRNN(nb_classes))
     model.add(Activation('softmax'))
     model.compile(loss=loss, optimizer=optim, metrics=['accuracy'])
     return model
